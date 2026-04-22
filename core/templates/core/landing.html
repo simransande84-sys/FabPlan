@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabrication Software | Optimize Production</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <span class="logo-text">FabPlan</span>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Toggle menu">☰</button>
+            <div class="nav-links">
+                <a href="#products">Products</a>
+                <a href="#solution">Solution</a>
+                <a href="#company">Company</a>
+                <a href="#contact">Contact Us</a>
+            </div>
+            <div class="nav-actions" style="display: flex; gap: 1rem; align-items: center;">
+                <a href="{% url 'login' %}" style="font-weight: 500; color: var(--brand-blue); transition: color 0.2s; text-decoration: none;">Log In</a>
+                <a href="{% url 'login' %}" class="btn btn-orange">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="animate-up delay-1">Futuristic Window and Door Software for Fenestration Industry</h1>
+                <p class="animate-up delay-2">A complete software application that solves the toughest challenges, reduces costs and helps your business grow.</p>
+                <div class="hero-buttons animate-up delay-3">
+                    <a href="{% url 'login' %}" class="btn btn-orange">Sign Up Now</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline">Log In</a>
+                </div>
+            </div>
+            <div class="hero-image-container animate-up delay-4">
+                <img src="{% static 'img/hero.png' %}" alt="Window and Door Fabrication Software Interface">
+            </div>
+        </div>
+    </header>
+
+    <!-- Industries Ribbon -->
+    <section class="industries-ribbon">
+        <div class="industries-container">
+            <div class="industry-title">
+                We Serve these<br><strong>Industries</strong>
+            </div>
+            <div class="industry-items">
+                <div class="industry-item">
+                    <div class="icon-circle orange-light"><span class="icon-window"></span></div>
+                    <span>Windows</span>
+                </div>
+                <div class="industry-item">
+                    <div class="icon-circle blue-light"><span class="icon-door"></span></div>
+                    <span>Front Doors</span>
+                </div>
+                <div class="industry-item">
+                    <div class="icon-circle green-light"><span class="icon-partition"></span></div>
+                    <span>Partitions</span>
+                </div>
+                <div class="industry-item">
+                    <div class="icon-circle purple-light"><span class="icon-facade"></span></div>
+                    <span>Façades</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Modules -->
+    <section id="products" class="modules-section">
+        <div class="container">
+            <h2 class="section-title">Key Modules</h2>
+            <div class="modules-grid">
+                <!-- Module 1 -->
+                <div class="module-card">
+                    <div class="module-icon-wrapper"><i class="ph ph-sliders"></i></div>
+                    <h3>Configuration Engine</h3>
+                    <p>Input parameters like width, height, and typology. The software temporarily saves this data and processes configurations instantly.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+                <!-- Module 2 -->
+                <div class="module-card">
+                    <div class="module-icon-wrapper"><i class="ph ph-database"></i></div>
+                    <h3>Rule-Based Database</h3>
+                    <p>Define hardware, profile cutting rules, and types in a central database to process window calculations accurately.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+                <!-- Module 3 -->
+                <div class="module-card">
+                    <div class="module-icon-wrapper"><i class="ph ph-calculator"></i></div>
+                    <h3>Automated Quoting</h3>
+                    <p>Generate highly accurate quotes for your customers based on processed rules, material costs, and hardware selections.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+                <!-- Module 4 -->
+                <div class="module-card">
+                    <div class="module-icon-wrapper"><i class="ph ph-file-text"></i></div>
+                    <h3>Detailed Reporting</h3>
+                    <p>Automatically generate essential production reports, including profile cutting charts, glass size charts, and accessories BOQ.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+                <!-- Module 5 -->
+                <div class="module-card">
+                    <div class="module-icon-wrapper"><i class="ph ph-calendar-check"></i></div>
+                    <h3>Production Planning</h3>
+                    <p>Optimize the entire production process, reduce material waste, and seamlessly schedule manufacturing in batches.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+                <!-- Module 6 -->
+                <div class="module-card">
+                    <div class="module-icon-wrapper"><i class="ph ph-factory"></i></div>
+                    <h3>Shop Floor Control</h3>
+                    <p>Empower your production team to easily monitor real-time work order status and track machine utilization.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+                <!-- Module 7 -->
+                <div class="module-card">
+                    <div class="module-icon-wrapper"><i class="ph ph-truck"></i></div>
+                    <h3>Dispatch & Tracking</h3>
+                    <p>Use our independent barcode scanning system to easily keep a log of all dispatched and installed products.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+                <!-- Module 8 -->
+                <div class="module-card">
+                    <div class="module-icon-wrapper"><i class="ph ph-check-circle"></i></div>
+                    <h3>Quality Assurance</h3>
+                    <p>Perform rigorous post-production and post-installation quality checks to ensure a highly efficient production line.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advantages Section (Solution) -->
+    <section id="solution" class="advantages-section">
+        <div class="container">
+            <div class="advantages-header">
+                <span class="advantages-subtitle">Your advantages</span>
+                <h2 class="advantages-title">This is what our customers value about us.</h2>
+            </div>
+            
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <div class="yellow-circle"></div>
+                    <h3>450+ catalogues</h3>
+                    <p>Our software is supplier-independent and includes data from over 450 suppliers.</p>
+                    <p class="benefit"><strong>Your benefit:</strong> freedom in the choice of systems. Always up-to-date data.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="yellow-circle"></div>
+                    <h3>Design more effectively</h3>
+                    <p>The intuitive user interface makes designing faster and more reliable.</p>
+                    <p class="benefit"><strong>Your benefit:</strong> a noticeable increase in productivity.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="yellow-circle"></div>
+                    <h3>Logic check</h3>
+                    <p>Intelligent verification mechanisms ensure that design and quoting are accurate.</p>
+                    <p class="benefit"><strong>Your benefit:</strong> correct results straight away, with no more costly follow-on errors.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="yellow-circle"></div>
+                    <h3>Perfectly integrated</h3>
+                    <p>Seamless integration with other systems such as CAD, ERP or CNC.</p>
+                    <p class="benefit"><strong>Your benefit:</strong> efficient workflows and consistently accurate data.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Company Section -->
+    <section id="company" class="modules-section" style="background-color: var(--bg-light); text-align: center;">
+        <div class="container">
+            <h2 class="section-title">About FabPlan</h2>
+            <p style="max-width: 800px; margin: 0 auto; font-size: 1.1rem; color: var(--text-light);">
+                We are a dedicated team of engineers and fenestration experts building the most advanced cloud-based software for window and door fabrication. Our mission is to streamline your entire production workflow, from quoting to installation, reducing errors and increasing profitability.
+            </p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-container">
+                <form>
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" placeholder="Your Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Your Email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" rows="5" placeholder="How can we help?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-orange" style="width: 100%;">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 FabPlan Software. All rights reserved.</p>
+        </div>
+    </footer>
+
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggle
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+            const navActions = document.querySelector('.nav-actions');
+
+            menuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                navActions.classList.toggle('active');
+            });
+
+            // Sticky Navbar Shadow & Scroll Spy
+            const navbar = document.querySelector('.navbar');
+            const sections = document.querySelectorAll('section[id]');
+            const navItems = document.querySelectorAll('.nav-links a');
+
+            window.addEventListener('scroll', () => {
+                // Navbar shadow
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+
+                // Scroll Spy
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (scrollY >= (sectionTop - 150)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href') === `#${current}`) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

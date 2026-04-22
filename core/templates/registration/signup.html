@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - FabPlan</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: var(--bg-color); padding: 40px 0;">
+    <div class="container" style="max-width: 450px; margin: 0; width: 100%;">
+        <div class="d-card" style="background: var(--card-bg); border-color: var(--border-color); color: var(--text-main); padding: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h2 style="text-align: center; margin-bottom: 20px; color: var(--text-main); font-size: 1.5rem; font-weight: 600;">Create an Account</h2>
+            
+            <form method="post" action="{% url 'signup' %}">
+                {% csrf_token %}
+                
+                {% for field in form %}
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="{{ field.id_for_label }}" style="display: block; font-weight: 500; margin-bottom: 5px; color: var(--text-main);">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 0.8rem;">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p style="color: var(--error); font-size: 0.85rem; margin-top: 4px;">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn-submit" style="width: 100%; margin-top: 15px;">Sign Up</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">
+                <p>Already have an account? <a href="{% url 'login' %}" style="color: var(--primary); text-decoration: none;">Log In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ensure Django form inputs get our styling -->
+    <style>
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+    </style>
+</body>
+</html>
