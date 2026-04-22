@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Window & Door Fabrication</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-<body>
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Window & Door Fabrication - FabPlan{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<div style="background-color: var(--bg-color); min-height: calc(100vh - 80px); padding-bottom: 60px;">
     <div class="container">
         <header>
-            <h1>Fabrication Planner</h1>
+            <h1 style="color: var(--brand-blue);">Fabrication Planner</h1>
             <p>Production & Cutting Optimization</p>
         </header>
 
@@ -70,19 +70,33 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="glass_type">Glass Type</label>
-                    <input type="text" id="glass_type" name="glass_type" required placeholder="e.g. 5mm Clear">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="glass_type">Glass Type</label>
+                        <select id="glass_type" name="glass_type" required>
+                            <option value="5mm Clear">5mm Clear</option>
+                            <option value="6mm Clear">6mm Clear</option>
+                            <option value="6mm Toughened">6mm Toughened</option>
+                            <option value="8mm Toughened">8mm Toughened</option>
+                            <option value="DGU 24mm">DGU 24mm</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="finish">Finish / Color</label>
+                        <select id="finish" name="finish" required>
+                            <option value="White Powder Coat">White Powder Coat</option>
+                            <option value="Black Matte">Black Matte</option>
+                            <option value="Anodized Silver">Anodized Silver</option>
+                            <option value="Wood Finish">Wood Finish</option>
+                            <option value="Anthracite Grey">Anthracite Grey</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="finish">Finish / Color</label>
-                    <input type="text" id="finish" name="finish" required placeholder="e.g. White Powder Coat">
-                </div>
-
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="mesh" name="mesh">
-                    <label for="mesh">Include Mesh</label>
+                <div class="form-group checkbox-group" style="display: flex; align-items: center; gap: 10px; margin-top: 10px; margin-bottom: 20px;">
+                    <input type="checkbox" id="mesh" name="mesh" style="width: 20px; height: 20px; margin: 0; flex-shrink: 0;">
+                    <label for="mesh" style="margin: 0;">Include Mesh</label>
                 </div>
 
                 <div class="form-group">
@@ -110,7 +124,7 @@
                     </thead>
                     <tbody>
                         {% for order in orders %}
-                        <tr class="clickable-row" onclick="openOrderDetails({{ order.id }})">
+                        <tr class="clickable-row" onclick="window.location.href='{% url 'order_detail_view' order.id %}'">
                             <td>{{ order.code }}</td>
                             <td>{{ order.get_product_type_display }}</td>
                             <td>{{ order.get_typology_display }}</td>
@@ -140,58 +154,35 @@
         </div>
     </div>
 
-    <!-- Right Side Drawer -->
-    <div id="order-drawer" class="drawer">
-        <div class="drawer-header">
-            <h2 id="drawer-title">Order Details</h2>
-            <button class="close-btn" onclick="closeDrawer()">&times;</button>
-        </div>
-        <div class="drawer-tabs">
-            <button class="d-tab-btn active" onclick="openDrawerTab(event, 'd-summary')">Summary</button>
-            <button class="d-tab-btn" onclick="openDrawerTab(event, 'd-cutting')">Cutting Plan</button>
-            <button class="d-tab-btn" onclick="openDrawerTab(event, 'd-glass')">Glass</button>
-            <button class="d-tab-btn" onclick="openDrawerTab(event, 'd-hardware')">Hardware</button>
-        </div>
-        
-        <div class="drawer-content-area">
-            <div id="d-summary" class="d-tab-content active">
-                <div id="drawer-summary-content" class="content-wrapper">Loading...</div>
-                <div style="display: flex; gap: 10px; margin-top: 16px;">
-                    <button id="recalculate-btn" class="btn-submit" style="flex: 1;">Recalculate & Optimize</button>
-                    <a id="download-pdf-btn" href="#" target="_blank" class="btn-submit" style="flex: 1; text-align: center; background-color: #4b5563; text-decoration: none; border: 1px solid #6b7280;">Download PDF</a>
-                </div>
-            </div>
-            <div id="d-cutting" class="d-tab-content">
-                <div id="drawer-cutting-content" class="content-wrapper">Loading...</div>
-            </div>
-            <div id="d-glass" class="d-tab-content">
-                <div id="drawer-glass-content" class="content-wrapper">Loading...</div>
-            </div>
-            <div id="d-hardware" class="d-tab-content">
-                <div id="drawer-hardware-content" class="content-wrapper">Loading...</div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="drawer-overlay" class="overlay" onclick="closeDrawer()"></div>
 
-    <script src="{% static 'js/app.js' %}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const newOrderId = urlParams.get('new_order_id');
-            if (newOrderId) {
-                // Switch to orders tab
-                const tabs = document.querySelectorAll('.tab-btn');
-                if(tabs.length >= 2) {
-                    tabs[1].click();
-                }
-                // Open drawer for the new order
-                setTimeout(() => {
-                    openOrderDetails(newOrderId);
-                }, 100);
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/app.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tab = urlParams.get('tab');
+        const newOrderId = urlParams.get('new_order_id');
+        
+        if (tab === 'orders') {
+            const tabs = document.querySelectorAll('.tab-btn');
+            if(tabs.length >= 2) {
+                tabs[1].click();
             }
-        });
-    </script>
-</body>
-</html>
+        }
+        
+        if (newOrderId) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            if(tabs.length >= 2) {
+                tabs[1].click();
+            }
+            // Navigate to the new order page
+            setTimeout(() => {
+                window.location.href = `/order/view/${newOrderId}/`;
+            }, 100);
+        }
+    });
+</script>
+{% endblock %}

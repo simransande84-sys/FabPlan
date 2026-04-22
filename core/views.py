@@ -12,23 +12,57 @@ from .services.hardware_engine import calculate_hardware
 from .services.glass_engine import calculate_glass
 from .services.bar_optimizer import optimize_profile_cuts
 
+from core.forms import CustomUserCreationForm
+
 def landing_page(request):
     return render(request, 'core/landing.html')
 
 def signup(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            login(request, user, backend='core.backends.EmailBackend')
             return redirect('dashboard')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'registration/signup.html', {'form': form})
 
 @login_required
 def dashboard(request):
-    orders = Order.objects.all().order_by('-created_at')
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        if Order.objects.filter(code=code).exists():
+            messages.error(request, f"Order code {code} already exists.")
+            return redirect('dashboard')
+            
+        try:
+            order = Order.objects.create(
+                user=request.user,
+                code=code,
+                customer_name=request.user.email
+            )
+            
+            design = DesignItem.objects.create(
+                order=order,
+                product_type=request.POST.get('product_type'),
+                width=float(request.POST.get('width', 0)),
+                height=float(request.POST.get('height', 0)),
+                typology=request.POST.get('typology'),
+                glass_type=request.POST.get('glass_type'),
+                finish=request.POST.get('finish'),
+                mesh=request.POST.get('mesh') == 'on',
+                quantity=int(request.POST.get('quantity', 1))
+            )
+            generate_cut_pieces(design)
+            messages.success(request, f"Order {code} created successfully.")
+            return redirect('order_detail_view', order_id=order.id)
+        except Exception as e:
+            messages.error(request, f"Error creating order: {str(e)}")
+            
+        return redirect("/dashboard/?tab=orders")
+
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
     
     context = {
         'orders': orders,
@@ -50,7 +84,7 @@ def api_create_order(request):
             if not items:
                 return JsonResponse({'success': False, 'error': 'No items in order'})
                 
-            order = Order.objects.create(code=order_code, customer_name=customer_name)
+            order = Order.objects.create(user=request.user, code=order_code, customer_name=customer_name)
             
             for item in items:
                 design = DesignItem.objects.create(
@@ -73,9 +107,8 @@ def api_create_order(request):
             
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
-@login_required
-def order_details(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
+def get_order_data(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
     
     if request.GET.get('recalculate') == 'true':
         for design in order.designs.all():
@@ -91,15 +124,15 @@ def order_details(request, order_id):
     all_cuts_qs = CutPiece.objects.filter(design__order=order)
     
     for design in order.designs.all():
-        profile_cost = sum((cut.profile.cost_per_bar / cut.profile.bar_length) * cut.length * cut.quantity for cut in design.cut_pieces.all())
+        profile_cost = sum(((cut.profile.cost_per_bar * 85) / cut.profile.bar_length) * cut.length * cut.quantity for cut in design.cut_pieces.all())
         
         hw_list = calculate_hardware(design)
-        hw_cost = sum(hw['quantity'] * 50 for hw in hw_list)
+        hw_cost = sum(hw['quantity'] * 450 for hw in hw_list)
         
         glass_list = calculate_glass(design)
-        glass_cost = sum(((g['width'] / 1000) * (g['height'] / 1000)) * g['quantity'] * 100 for g in glass_list)
+        glass_cost = sum(((g['width'] / 1000) * (g['height'] / 1000)) * g['quantity'] * 1200 for g in glass_list)
         
-        labor_cost = 200 * design.quantity
+        labor_cost = 1500 * design.quantity
         
         total_profile_cost += profile_cost
         total_hw_cost += hw_cost
@@ -137,7 +170,9 @@ def order_details(request, order_id):
     agg_glass = []
     agg_hw = []
     for design in order.designs.all():
-        agg_glass.extend(calculate_glass(design))
+        for g in calculate_glass(design):
+            g['area'] = round((g['width'] / 1000) * (g['height'] / 1000), 2)
+            agg_glass.append(g)
         agg_hw.extend(calculate_hardware(design))
         
     data = {
@@ -163,5 +198,16 @@ def order_details(request, order_id):
         "glass": agg_glass,
         "hardware": agg_hw
     }
-    
+    return data
+
+@login_required
+def order_details(request, order_id):
+    data = get_order_data(request, order_id)
     return JsonResponse(data)
+
+@login_required
+def order_detail_view(request, order_id):
+    data = get_order_data(request, order_id)
+    return render(request, 'core/order_detail.html', {'data': data})
+
+

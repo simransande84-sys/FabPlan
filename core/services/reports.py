@@ -7,6 +7,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_RIGHT, TA_LEFT
+from reportlab.lib.units import inch
 from datetime import datetime, timedelta
 from core.models import Order, DesignItem, CutPiece, Profile
 from .hardware_engine import calculate_hardware
@@ -45,36 +46,36 @@ def generate_quotation_pdf():
             profile_cost = 0
             cuts = design.cut_pieces.all()
             for cut in cuts:
-                cost_per_mm = cut.profile.cost_per_bar / cut.profile.bar_length
+                cost_per_mm = (cut.profile.cost_per_bar * 85) / cut.profile.bar_length
                 profile_cost += (cost_per_mm * cut.length * cut.quantity)
                 
             hw_cost = 0
             hw_list = calculate_hardware(design)
             for hw in hw_list:
-                hw_cost += hw['quantity'] * 50
+                hw_cost += hw['quantity'] * 450
                 
             glass_cost = 0
             glass_list = calculate_glass(design)
             for g in glass_list:
                 area_sqm = (g['width'] / 1000) * (g['height'] / 1000)
-                glass_cost += area_sqm * g['quantity'] * 100
+                glass_cost += area_sqm * g['quantity'] * 1200
                 
-            labor_cost = 200 * design.quantity
+            labor_cost = 1500 * design.quantity
             
             total_design_cost = profile_cost + hw_cost + glass_cost + labor_cost
             order_total += total_design_cost
             
-            p.drawString(120, y, f"- Profile Material: ${profile_cost:.2f}")
+            p.drawString(120, y, f"- Profile Material: Rs. {profile_cost:.2f}")
             y -= 15
-            p.drawString(120, y, f"- Hardware: ${hw_cost:.2f}")
+            p.drawString(120, y, f"- Hardware: Rs. {hw_cost:.2f}")
             y -= 15
-            p.drawString(120, y, f"- Glass: ${glass_cost:.2f}")
+            p.drawString(120, y, f"- Glass: Rs. {glass_cost:.2f}")
             y -= 15
-            p.drawString(120, y, f"- Labor: ${labor_cost:.2f}")
+            p.drawString(120, y, f"- Labor: Rs. {labor_cost:.2f}")
             y -= 20
             
         p.setFont("Helvetica-Bold", 10)
-        p.drawString(120, y, f"Total for Order {order.code}: ${order_total:.2f}")
+        p.drawString(120, y, f"Total for Order {order.code}: Rs. {order_total:.2f}")
         y -= 30
         grand_total += order_total
 
@@ -84,7 +85,7 @@ def generate_quotation_pdf():
         
     y -= 20
     p.setFont("Helvetica-Bold", 14)
-    p.drawString(100, y, f"Grand Total: ${grand_total:.2f}")
+    p.drawString(100, y, f"Grand Total: Rs. {grand_total:.2f}")
 
     p.showPage()
     p.save()
@@ -103,13 +104,13 @@ def generate_quotation_excel():
     
     for order in orders:
         for design in order.designs.all():
-            profile_cost = sum((cut.profile.cost_per_bar / cut.profile.bar_length) * cut.length * cut.quantity for cut in design.cut_pieces.all())
+            profile_cost = sum(((cut.profile.cost_per_bar * 85) / cut.profile.bar_length) * cut.length * cut.quantity for cut in design.cut_pieces.all())
             
-            hw_cost = sum(hw['quantity'] * 50 for hw in calculate_hardware(design))
+            hw_cost = sum(hw['quantity'] * 450 for hw in calculate_hardware(design))
             
-            glass_cost = sum(((g['width'] / 1000) * (g['height'] / 1000)) * g['quantity'] * 100 for g in calculate_glass(design))
+            glass_cost = sum(((g['width'] / 1000) * (g['height'] / 1000)) * g['quantity'] * 1200 for g in calculate_glass(design))
             
-            labor_cost = 200 * design.quantity
+            labor_cost = 1500 * design.quantity
             total_design_cost = profile_cost + hw_cost + glass_cost + labor_cost
             grand_total += total_design_cost
             
@@ -255,20 +256,19 @@ def generate_single_quotation_pdf(order_id):
     labor_cost = 0
     
     for design in order.designs.all():
-        profile_cost += sum((c.profile.cost_per_bar / c.profile.bar_length) * c.length * c.quantity for c in design.cut_pieces.all())
-        hw_cost += sum(hw['quantity'] * 50 for hw in calculate_hardware(design))
-        glass_cost += sum(((g['width'] / 1000) * (g['height'] / 1000)) * g['quantity'] * 100 for g in calculate_glass(design))
-        labor_cost += 200 * design.quantity
+        profile_cost += sum(((c.profile.cost_per_bar * 85) / c.profile.bar_length) * c.length * c.quantity for c in design.cut_pieces.all())
+        hw_cost += sum(hw['quantity'] * 450 for hw in calculate_hardware(design))
+        glass_cost += sum(((g['width'] / 1000) * (g['height'] / 1000)) * g['quantity'] * 1200 for g in calculate_glass(design))
+        labor_cost += 1500 * design.quantity
         
     total_qty = sum(d.quantity for d in order.designs.all())
     
-    # Items Table
     table_data = [
-        ['DESCRIPTION', 'QUANTITY', 'UNIT PRICE ($)', 'AMOUNT ($)'],
+        ['DESCRIPTION', 'QUANTITY', 'UNIT PRICE (INR)', 'AMOUNT (INR)'],
         [f"Profile Material (Multiple)", f"{total_qty} units", f"{profile_cost/max(total_qty, 1):.2f}", f"{profile_cost:.2f}"],
         ["Hardware & Accessories", f"{total_qty} units", f"{hw_cost/max(total_qty, 1):.2f}", f"{hw_cost:.2f}"],
         ["Glass Panels", f"{total_qty} units", f"{glass_cost/max(total_qty, 1):.2f}", f"{glass_cost:.2f}"],
-        ["Cutting & Labor", f"{total_qty} units", "200.00", f"{labor_cost:.2f}"]
+        ["Cutting & Labor", f"{total_qty} units", "1500.00", f"{labor_cost:.2f}"]
     ]
     
     items_table = Table(table_data, colWidths=[3.5*inch, 1.5*inch, 1.25*inch, 1.25*inch])
@@ -290,14 +290,14 @@ def generate_single_quotation_pdf(order_id):
     
     # Totals Table
     subtotal = profile_cost + hw_cost + glass_cost + labor_cost
-    vat = subtotal * 0.20
+    vat = subtotal * 0.18  # 18% GST for India
     total = subtotal + vat
     
     totals_data = [
-        ["SUBTOTAL:", f"${subtotal:.2f}"],
-        [f"VAT 20% from ${subtotal:.2f}", f"${vat:.2f}"],
-        ["TOTAL (USD):", f"${total:.2f}"],
-        ["TOTAL DUE (USD):", f"${total:.2f}"]
+        ["SUBTOTAL:", f"Rs. {subtotal:.2f}"],
+        [f"GST 18% from Rs. {subtotal:.2f}", f"Rs. {vat:.2f}"],
+        ["TOTAL (INR):", f"Rs. {total:.2f}"],
+        ["TOTAL DUE (INR):", f"Rs. {total:.2f}"]
     ]
     
     totals_table = Table(totals_data, colWidths=[2.5*inch, 1.25*inch])

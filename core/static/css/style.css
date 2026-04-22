@@ -1,12 +1,13 @@
 /* core/static/css/style.css */
 :root {
-    --bg-color: #f9fafb;
-    --card-bg: #ffffff;
-    --text-main: #111827;
-    --text-muted: #6b7280;
+    --bg-color: #f4ede4;
+    --card-bg: #fdfbf7;
+    --text-main: #2c2a29;
+    --text-muted: #5c5552;
     --border-color: #e5e7eb;
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
+    --primary: #d97706;
+    --primary-hover: #b45309;
+    --brand-blue: #8b5a2b;
     --error: #ef4444;
     --success: #10b981;
 }

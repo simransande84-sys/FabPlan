@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Profile(models.Model):
     PROFILE_TYPES = (
@@ -23,6 +24,7 @@ class Hardware(models.Model):
         return f"{self.name} for {self.typology}"
 
 class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', null=True, blank=True)
     code = models.CharField(max_length=50, unique=True)
     customer_name = models.CharField(max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

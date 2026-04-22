@@ -16,7 +16,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <a href="{% url 'landing' %}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
+                <a href="{% url 'landing_page' %}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit;">
                     <div class="logo-icon"></div>
                     <span class="logo-text">FabPlan</span>
                 </a>
@@ -26,10 +26,10 @@
                 {% if user.is_authenticated %}
                     <a href="{% url 'dashboard' %}">Dashboard</a>
                 {% else %}
-                    <a href="{% url 'landing' %}#products">Products</a>
-                    <a href="{% url 'landing' %}#solution">Solution</a>
-                    <a href="{% url 'landing' %}#company">Company</a>
-                    <a href="{% url 'landing' %}#contact">Contact Us</a>
+                    <a href="{% url 'landing_page' %}#products">Products</a>
+                    <a href="{% url 'landing_page' %}#solution">Solution</a>
+                    <a href="{% url 'landing_page' %}#company">Company</a>
+                    <a href="{% url 'landing_page' %}#contact">Contact Us</a>
                 {% endif %}
             </div>
             <div class="nav-actions" style="display: flex; gap: 1rem; align-items: center;">

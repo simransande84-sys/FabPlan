@@ -1,7 +1,9 @@
-# core/views_reports.py
 from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
 from .services import reports
+from .models import Order
 
+@login_required
 def download_quotation_pdf(request):
     buffer = reports.generate_quotation_pdf()
     response = HttpResponse(buffer, content_type='application/pdf')
@@ -26,7 +28,12 @@ def download_cutting_chart_pdf(request):
     response['Content-Disposition'] = 'attachment; filename="cutting_chart.pdf"'
     return response
 
+@login_required
 def download_single_quotation_pdf(request, order_id):
+    order = Order.objects.filter(id=order_id, user=request.user).first()
+    if not order:
+        from django.http import Http404
+        raise Http404("Order not found or permission denied")
     buffer = reports.generate_single_quotation_pdf(order_id)
     if not buffer:
         from django.http import Http404
