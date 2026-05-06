@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_exempt
-from .models import Order, DesignItem, CutPiece
+from .models import Order, DesignItem, CutPiece, GlassRate
 from .services.cutting_engine import generate_cut_pieces
 from .services.hardware_engine import calculate_hardware
 from .services.glass_engine import calculate_glass
@@ -42,7 +42,7 @@ def dashboard(request):
                 code=code,
                 customer_name=request.user.email
             )
-            
+            # Data is saved in database
             design = DesignItem.objects.create(
                 order=order,
                 product_type=request.POST.get('product_type'),
@@ -126,11 +126,23 @@ def get_order_data(request, order_id):
     for design in order.designs.all():
         profile_cost = sum(((cut.profile.cost_per_bar * 85) / cut.profile.bar_length) * cut.length * cut.quantity for cut in design.cut_pieces.all())
         
+#         hw_list = [
+#         {"type": "hinge", "quantity": 4},
+#         {"type": "handle", "quantity": 2}
+#         ]
+# we get this from the service hardware_engine.py based on the design typology and quantity
         hw_list = calculate_hardware(design)
-        hw_cost = sum(hw['quantity'] * 450 for hw in hw_list)
+        hw_cost = sum(hw['total_cost'] for hw in hw_list)
         
         glass_list = calculate_glass(design)
-        glass_cost = sum(((g['width'] / 1000) * (g['height'] / 1000)) * g['quantity'] * 1200 for g in glass_list)
+        
+        try:
+            glass_rate_obj = GlassRate.objects.get(glass_type=design.glass_type)
+            glass_price_per_sqm = glass_rate_obj.price_per_sqm
+        except GlassRate.DoesNotExist:
+            glass_price_per_sqm = 1200 # fallback
+            
+        glass_cost = sum(((g['width'] / 1000) * (g['height'] / 1000)) * g['quantity'] * glass_price_per_sqm for g in glass_list)
         
         labor_cost = 1500 * design.quantity
         
@@ -153,7 +165,9 @@ def get_order_data(request, order_id):
         for c in all_cuts_qs
     ]
     
-    optimized = optimize_profile_cuts(all_cuts_qs)
+    optimized = optimize_profile_cuts(all_cuts_qs) 
+#     Reduces waste
+#     Improves material usage
     
     total_waste_sum = 0
     total_bars = 0
@@ -204,6 +218,15 @@ def get_order_data(request, order_id):
 def order_details(request, order_id):
     data = get_order_data(request, order_id)
     return JsonResponse(data)
+    # Final Response (Frontend gets this)
+    
+#   "costs": {
+#     "profile": 5000,
+#     "glass": 3000,
+#     "hardware": 2000,
+#     "labor": 1500,
+#     "total": 11500
+#     }
 
 @login_required
 def order_detail_view(request, order_id):

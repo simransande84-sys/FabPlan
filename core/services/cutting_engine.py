@@ -1,19 +1,40 @@
 from core.models import Profile, CutPiece
 
+def get_best_profile(design, profile_type):
+    """
+    Intelligently fetch the best matching profile based on typology and product type.
+    """
+    # Try exact match with product type and typology
+    profile = Profile.objects.filter(
+        type=profile_type
+    ).filter(
+        name__icontains=design.typology
+    ).filter(
+        name__icontains=design.product_type
+    ).first()
+    
+    if profile:
+        return profile
+        
+    # Try match with typology only
+    profile = Profile.objects.filter(
+        type=profile_type,
+        name__icontains=design.typology
+    ).first()
+    
+    if profile:
+        return profile
+        
+    # Fallback to any profile of this type
+    return Profile.objects.filter(type=profile_type).first()
+
 def generate_cut_pieces(design):
     """
     Generates CutPiece records based on the DesignItem dimensions and typology.
     """
-    # Get profiles
-    try:
-        frame_profile = Profile.objects.get(type='frame')
-    except Profile.DoesNotExist:
-        frame_profile = None
-
-    try:
-        sash_profile = Profile.objects.get(type='sash')
-    except Profile.DoesNotExist:
-        sash_profile = None
+    # Intelligently get profiles based on design typology and product type
+    frame_profile = get_best_profile(design, 'frame')
+    sash_profile = get_best_profile(design, 'sash')
 
     pieces_to_create = []
 
@@ -37,9 +58,8 @@ def generate_cut_pieces(design):
         ))
 
     # 2. Sash Cuts
-    # Note: sliding defaults to 2 panels based on requirements
     if sash_profile and design.typology in ['sliding', 'casement']:
-        panels = 2 if design.typology == 'sliding' else 1
+        panels = design.number_of_panels
         
         sash_h_cut = design.height - 54
         sash_w_cut = (design.width / panels) - 26

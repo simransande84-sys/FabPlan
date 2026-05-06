@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models # import models from django.db to define database models
 from django.contrib.auth.models import User
 
 class Profile(models.Model):
@@ -19,6 +19,7 @@ class Hardware(models.Model):
     name = models.CharField(max_length=100)
     typology = models.CharField(max_length=50) # e.g., 'sliding', 'casement'
     quantity_formula = models.CharField(max_length=200, help_text='Formula using "panels" e.g., "2 * panels"')
+    price_per_unit = models.FloatField(default=0)
 
     def __str__(self):
         return f"{self.name} for {self.typology}"
@@ -51,6 +52,7 @@ class DesignItem(models.Model):
     finish = models.CharField(max_length=100)
     mesh = models.BooleanField(default=False)
     quantity = models.PositiveIntegerField(default=1)
+    number_of_panels = models.IntegerField(default=1)
     
     def __str__(self):
         return f"{self.get_product_type_display()} - {self.width}x{self.height} (Order: {self.order.code})"
@@ -63,3 +65,16 @@ class CutPiece(models.Model):
 
     def __str__(self):
         return f"{self.quantity}x {self.length}mm of {self.profile.name} (Design: {self.design.id})"
+
+class StandardBarLength(models.Model):
+    length = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.length} mm"
+
+class GlassRate(models.Model):
+    glass_type = models.CharField(max_length=100, unique=True)
+    price_per_sqm = models.FloatField(default=0)
+
+    def __str__(self):
+        return f"{self.glass_type} - ₹{self.price_per_sqm}/sqm"

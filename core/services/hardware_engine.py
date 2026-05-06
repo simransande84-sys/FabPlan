@@ -5,6 +5,7 @@ def calculate_hardware(design):
     Calculates hardware needed for a given DesignItem based on its typology and quantity.
     Returns a list of dicts: [{'name': '...', 'quantity': ...}]
     """
+    # Get hardware from database
     hardware_list = Hardware.objects.filter(typology__iexact=design.typology)
     
     results = []
@@ -28,13 +29,17 @@ def calculate_hardware(design):
             
             results.append({
                 'name': hw.name,
-                'quantity': total_qty
+                'quantity': total_qty,
+                'price_per_unit': hw.price_per_unit,
+                'total_cost': total_qty * hw.price_per_unit
             })
         except Exception:
             # If formula parsing fails, default to 1 per window
             results.append({
                 'name': hw.name,
-                'quantity': design.quantity
+                'quantity': design.quantity,
+                'price_per_unit': hw.price_per_unit,
+                'total_cost': design.quantity * hw.price_per_unit
             })
             
     return results

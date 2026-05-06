@@ -1,24 +1,11 @@
-# core/services/bar_optimizer.py
-
-def optimize_cuts(cuts):
+def optimize_cuts(cuts, bar_length=6000):
     """
     Implements First-Fit Decreasing (FFD) Bin Packing Algorithm.
     :param cuts: List of dictionaries or objects with 'length' and 'quantity'.
                  For simplicity, let's assume cuts is a flat list of lengths [1200, 1200, 800, ...]
+    :param bar_length: Length of a single bar (default 6000mm)
     :return: List of bars, where each bar is a dict with 'cuts', 'leftover', and 'waste_percentage'
     """
-    from core.models import StandardBarLength
-
-    # Fetch available bar lengths from database
-    available_bar_lengths = list(StandardBarLength.objects.values_list('length', flat=True))
-    
-    # Fallback default if no lengths are defined in DB
-    if not available_bar_lengths:
-        available_bar_lengths = [6000, 7500, 8000]
-
-    # Sort available lengths to easily pick the smallest one that fits
-    available_bar_lengths.sort()
-
     # Sort cuts in descending order
     sorted_cuts = sorted(cuts, reverse=True)
     
@@ -36,21 +23,10 @@ def optimize_cuts(cuts):
         
         # If it doesn't fit in any existing bar, create a new one
         if not placed:
-            # Select the smallest possible bar that can fit the cut
-            best_bar_length = None
-            for length in available_bar_lengths:
-                if length >= cut:
-                    best_bar_length = length
-                    break
-            
-            # If the cut is larger than any available bar length, use the largest available
-            if best_bar_length is None:
-                best_bar_length = available_bar_lengths[-1]
-                
             bars.append({
                 'cuts': [cut],
-                'leftover': best_bar_length - cut,
-                'bar_length': best_bar_length
+                'leftover': bar_length - cut,
+                'bar_length': bar_length
             })
             
     # Calculate waste percentage for each bar
@@ -77,6 +53,6 @@ def optimize_profile_cuts(cut_pieces):
     optimized_results = {}
     
     for profile, lengths in profile_cuts.items():
-        optimized_results[profile.name] = optimize_cuts(lengths)
+        optimized_results[profile.name] = optimize_cuts(lengths, profile.bar_length)
         
     return optimized_results
